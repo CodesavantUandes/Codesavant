@@ -22,6 +22,39 @@ async function runFlaskServer() {
   });
 }
 
+async function createFileInWorkspace() {
+  let name = vscode.workspace.name;
+  console.log("Nombre de carpeta: " + name);
+  if (name == undefined) {
+    const opt = await vscode.window.showErrorMessage(
+      "Debe abrir una carpeta de trabajo",
+      "Abrir carpeta"
+    );
+    if (opt == "Abrir carpeta") {
+      let carpeta = await vscode.commands.executeCommand("vscode.openFolder");
+    }
+    name = vscode.workspace.name;
+    console.log("carpeta abierta: "+name);
+    console.log(opt);
+    
+  }
+  const fileName = await vscode.window.showInputBox();
+  console.log("registrando nombre de archivo .py: "+ fileName)
+  const newFilePath = vscode.Uri.joinPath(
+    vscode.workspace.workspaceFolders![0].uri,
+    fileName+".py" // Replace with the desired file name
+  );
+
+  const fileContent = Buffer.from("Hello, world file!", "utf8"); // Replace with the desired content
+
+  try {
+    await vscode.workspace.fs.writeFile(newFilePath, fileContent);
+    vscode.window.showInformationMessage("File created successfully.");
+  } catch (error: any) {
+    vscode.window.showErrorMessage(`Error creating file: ${error.message}`);
+  }
+}
+
 async function stopFlaskServer() {
   try {
     const response = await axios.post("http://localhost:3000/shutdown");
@@ -73,13 +106,17 @@ export function activate(context: vscode.ExtensionContext) {
         const serverURL = "http://localhost:3000/process-file";
 
         // Realiza una solicitud POST al servidor con el contenido del archivo
-        const response = await axios.post(serverURL, { content: fileContent });
+        let thisapikey = await vscode.window.showInputBox();
+        const response = await axios.post(serverURL, { content: fileContent, apikey: thisapikey});
         console.log(response);
+        const fileReturn = response.data.fileReturn;
+        console.log(fileReturn);
         // Si el servidor responde con éxito, muestra una notificación
         if (response.status === 200) {
           vscode.window.showInformationMessage(
             "Solicitud al servidor completada con éxito"
           );
+          createFileInWorkspace();
         }
       } catch (error) {
         if (error instanceof Error) {
@@ -108,32 +145,11 @@ export function activate(context: vscode.ExtensionContext) {
       vscode.window.showWarningMessage("Servidor Flask detenido");
     }
   );
-  const createFile = vscode.commands.registerCommand(
+  let createFile = vscode.commands.registerCommand(
     "intelliuml.createFile",
     async () => {
-      const name = vscode.workspace.name;
-      console.log("Nombre de carpeta: "+name);
-      if (name == undefined){
-        const opt = await vscode.window.showErrorMessage('Debe abrir una carpeta de trabajo', "Abrir carpeta");
-        if (opt == "Abrir carpeta"){
-          vscode.commands.executeCommand("vscode.openFolder");
-        }
-        console.log(opt);
-        return
-      }
-      const newFilePath = vscode.Uri.joinPath(
-        vscode.workspace.workspaceFolders![0].uri,
-        "new-file.txt" // Replace with the desired file name
-      );
 
-      const fileContent = Buffer.from("Hello, world file!", "utf8"); // Replace with the desired content
-
-      try {
-        await vscode.workspace.fs.writeFile(newFilePath, fileContent);
-        vscode.window.showInformationMessage("File created successfully.");
-      } catch (error: any) {
-        vscode.window.showErrorMessage(`Error creating file: ${error.message}`);
-      }
+      createFileInWorkspace();
     }
   );
 

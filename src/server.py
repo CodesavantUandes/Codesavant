@@ -15,7 +15,11 @@ def process_file():
     file_content = data.get('content')
     print(file_content)
 
-    return jsonify({'message': 'Archivo procesado correctamente'})
+    return jsonify(
+        {
+            'message': 'Archivo procesado correctamente',
+            'fileReturn': 'Aqui va el archivo de python'
+            })
 
 #Server shutdown
 @app.route('/shutdown', methods=['POST'])
