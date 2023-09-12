@@ -3,7 +3,6 @@ import requests
 import json
 import openai
 
-openai.api_key = "APIKEY"
 openai.api_base = "https://cog-r64zdcyjshwjk.openai.azure.com/"
 openai.api_type =  'azure'
 openai.api_version = '2023-05-15'
@@ -11,9 +10,10 @@ model_name = ['gpt-35-turbo-mic', 'davinci','embedding','chat']
 
 class API():
     
-    def __init__(self, model, entry, tokens, temperatura):
+    def __init__(self, key, model, entry, tokens, temperatura):
         
         super().__init__()
+        openai.api_key = key
         self.model = model
         self.prompt = entry
         self.entry = entry

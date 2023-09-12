@@ -304,4 +304,5 @@ def main():
     print(p)
     prompt = p
 
-main()
+if (__name__ == "__main__" ):
+  main()

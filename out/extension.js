@@ -35,7 +35,7 @@ async function createFileInWorkspace(content) {
     }
     const fileName = await vscode.window.showInputBox();
     console.log("registrando nombre de archivo .py: " + fileName);
-    const newFilePath = vscode.Uri.joinPath(vscode.workspace.workspaceFolders[0].uri, fileName + ".py" // Replace with the desired file name
+    const newFilePath = vscode.Uri.joinPath(vscode.workspace.workspaceFolders[0].uri, fileName + ".txt" // Replace with the desired file name
     );
     const fileContent = Buffer.from(content, "utf8"); // Replace with the desired content
     try {
@@ -88,13 +88,16 @@ function activate(context) {
             // Realiza una solicitud POST al servidor con el contenido del archivo
             let thisapikey = await vscode.window.showInputBox();
             const response = await axios_1.default.post(serverURL, { content: fileContent, apikey: thisapikey });
-            console.log(response);
+            //console.log(response);
             const fileReturn = response.data.fileReturn;
-            console.log(fileReturn);
+            const cwd = response.data.cwd;
+            const prompt = response.data.prompt;
+            console.log(prompt);
+            console.log("retornofinal: \n" + fileReturn);
             // Si el servidor responde con éxito, muestra una notificación
             if (response.status === 200) {
                 vscode.window.showInformationMessage("Solicitud al servidor completada con éxito");
-                createFileInWorkspace(fileReturn);
+                createFileInWorkspace(prompt);
             }
         }
         catch (error) {
