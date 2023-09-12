@@ -22,7 +22,7 @@ async function runFlaskServer() {
   });
 }
 
-async function createFileInWorkspace() {
+async function createFileInWorkspace(content:string) {
   let name = vscode.workspace.name;
   console.log("Nombre de carpeta: " + name);
   if (name == undefined) {
@@ -45,7 +45,7 @@ async function createFileInWorkspace() {
     fileName+".py" // Replace with the desired file name
   );
 
-  const fileContent = Buffer.from("Hello, world file!", "utf8"); // Replace with the desired content
+  const fileContent = Buffer.from(content, "utf8"); // Replace with the desired content
 
   try {
     await vscode.workspace.fs.writeFile(newFilePath, fileContent);
@@ -116,7 +116,7 @@ export function activate(context: vscode.ExtensionContext) {
           vscode.window.showInformationMessage(
             "Solicitud al servidor completada con éxito"
           );
-          createFileInWorkspace();
+          createFileInWorkspace(fileReturn);
         }
       } catch (error) {
         if (error instanceof Error) {
@@ -149,7 +149,7 @@ export function activate(context: vscode.ExtensionContext) {
     "intelliuml.createFile",
     async () => {
 
-      createFileInWorkspace();
+      createFileInWorkspace("hola perro");
     }
   );
 

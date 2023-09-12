@@ -21,7 +21,7 @@ async function runFlaskServer() {
         console.log(`Flask Server Process exited with code ${exit}`);
     });
 }
-async function createFileInWorkspace() {
+async function createFileInWorkspace(content) {
     let name = vscode.workspace.name;
     console.log("Nombre de carpeta: " + name);
     if (name == undefined) {
@@ -37,7 +37,7 @@ async function createFileInWorkspace() {
     console.log("registrando nombre de archivo .py: " + fileName);
     const newFilePath = vscode.Uri.joinPath(vscode.workspace.workspaceFolders[0].uri, fileName + ".py" // Replace with the desired file name
     );
-    const fileContent = Buffer.from("Hello, world file!", "utf8"); // Replace with the desired content
+    const fileContent = Buffer.from(content, "utf8"); // Replace with the desired content
     try {
         await vscode.workspace.fs.writeFile(newFilePath, fileContent);
         vscode.window.showInformationMessage("File created successfully.");
@@ -94,7 +94,7 @@ function activate(context) {
             // Si el servidor responde con éxito, muestra una notificación
             if (response.status === 200) {
                 vscode.window.showInformationMessage("Solicitud al servidor completada con éxito");
-                createFileInWorkspace();
+                createFileInWorkspace(fileReturn);
             }
         }
         catch (error) {
@@ -116,7 +116,7 @@ function activate(context) {
         vscode.window.showWarningMessage("Servidor Flask detenido");
     });
     let createFile = vscode.commands.registerCommand("intelliuml.createFile", async () => {
-        createFileInWorkspace();
+        createFileInWorkspace("hola perro");
     });
     context.subscriptions.push(openFile);
     context.subscriptions.push(sendRequestToServer);
